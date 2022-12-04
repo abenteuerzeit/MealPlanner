@@ -10,7 +10,7 @@ namespace MealPlanner
             int totalCalories = 0;
 
             // Set the gender for the meal plan
-            Gender gender = Gender.Female;
+            Genders gender = Genders.Female;
 
             // Set the age for the meal plan
             int age = 0;

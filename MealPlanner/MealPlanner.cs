@@ -9,8 +9,6 @@ namespace MealPlanner
     /// </summary>
     public class MealPlannerCalculator
     {
-
-
         // Constants for average calories per day by gender and age
         private const int MALE_CALORIES_PER_DAY = 2500;
         private const int FEMALE_CALORIES_PER_DAY = 2000;
@@ -30,53 +28,25 @@ namespace MealPlanner
 
         // Member variables
         private int _totalCalories;
-        private Gender _gender;
+        private Genders _gender;
         private int _age; // Renamed field
         private int _height;
         private int _weight;
         private ActivityLevel _activityLevel;
 
+        public List<string> MealPlan { get; set; }
         public int TotalCalories { get => _totalCalories; set => _totalCalories = value; }
-        public Gender Gender1 { get => _gender; set => _gender = value; }
+        public Genders Gender { get => _gender; set => _gender = value; }
         public int Age { get => _age; set => _age = value; } // Renamed property
         public int Height { get => _height; set => _height = value; }
         public int Weight { get => _weight; set => _weight = value; }
         public ActivityLevel ActivityLevel1 { get => _activityLevel; set => _activityLevel = value; }
 
-        // Enum for age group
-        public enum AgeGroup
-        {
-            Child,
-            Teenager,
-            Adult,
-            Senior,
-            Elderly
-        }
-
-
-        // Enum for gender
-        public enum Gender
-        {
-            Male,
-            Female
-        }
-
-
-        // Enum for activity level
-        public enum ActivityLevel
-        {
-            Sedentary,
-            LightlyActive,
-            ModeratelyActive,
-            VeryActive,
-            ExtremelyActive
-        }
-
         // Constructor
-        public MealPlannerCalculator(int totalCalories, Gender gender, int age, int height, int weight, ActivityLevel activityLevel)
+        public MealPlannerCalculator(int totalCalories, Genders gender, int age, int height, int weight, ActivityLevel activityLevel)
         {
             TotalCalories = totalCalories;
-            Gender1 = gender;
+            Gender = gender;
             Age = age;
             Height = height;
             Weight = weight;
@@ -93,52 +63,105 @@ namespace MealPlanner
             AgeGroup.Elderly;
         }
 
-
         // Generates a simple meal plan based on the given data
-        public void GenerateMealPlan()
+        public string GenerateMealPlan()
         {
             // Calculate the average number of calories per day based on gender and age
-            int averageCaloriesPerDay = AVERAGE_CALORIES_PER_DAY[Gender1][GetAgeGroup()];
+            int averageCaloriesPerDay;
+            switch (GetAgeGroup())
+            {
+                case AgeGroup.Child:
+                    averageCaloriesPerDay = CHILD_CALORIES_PER_DAY;
+                    break;
+                case AgeGroup.Teenager:
+                    averageCaloriesPerDay = TEENAGER_CALORIES_PER_DAY;
+                    break;
+                case AgeGroup.Adult:
+                    averageCaloriesPerDay = ADULT_CALORIES_PER_DAY;
+                    break;
+                case AgeGroup.Senior:
+                    averageCaloriesPerDay = SENIOR_CALORIES_PER_DAY;
+                    break;
+                case AgeGroup.Elderly:
+                    averageCaloriesPerDay = ELDERLY_CALORIES_PER_DAY;
+                    break;
+                default:
+                    averageCaloriesPerDay = 0;
+                    break;
+            }
 
             // Calculate the number of calories burned per day based on activity level
-            int caloriesBurnedPerDay = GetCaloriesBurnedPerDay();
+            int caloriesBurnedPerDay;
+            switch (ActivityLevel1)
+            {
+                case ActivityLevel.Sedentary:
+                    caloriesBurnedPerDay = SEDENTARY_CALORIES_BURNED;
+                    break;
+                case ActivityLevel.LightlyActive:
+                    caloriesBurnedPerDay = LIGHTLY_ACTIVE_CALORIES_BURNED;
+                    break;
+                case ActivityLevel.ModeratelyActive:
+                    caloriesBurnedPerDay = MODERATELY_ACTIVE_CALORIES_BURNED;
+                    break;
+                case ActivityLevel.VeryActive:
+                    caloriesBurnedPerDay = VERY_ACTIVE_CALORIES_BURNED;
+                    break;
+                case ActivityLevel.ExtremelyActive:
+                    caloriesBurnedPerDay = EXTREMELY_ACTIVE_CALORIES_BURNED;
+                    break;
+                default:
+                    caloriesBurnedPerDay = 0;
+                    break;
+            }
 
-            // Calculate the number of calories to consume per day based on total calories and activity level
-            int caloriesToConsumePerDay = TotalCalories - (averageCaloriesPerDay - caloriesBurnedPerDay);
+            // Calculate the number of calories to consume per day
+            int caloriesToConsumePerDay = averageCaloriesPerDay - caloriesBurnedPerDay;
 
-            // Print the results
-            Console.WriteLine($"Meal Plan for a {Gender1} aged {Age} who is {Height} cm tall and weighs {Weight} kg");
-            Console.WriteLine($"Activity Level: {ActivityLevel1}");
-            Console.WriteLine($"Average Calories per Day: {averageCaloriesPerDay}");
-            Console.WriteLine($"Calories Burned per Day: {caloriesBurnedPerDay}");
-            Console.WriteLine($"Calories to Consume per Day: {caloriesToConsumePerDay}");
+            // Generate a simple meal plan using string interpolation
+            string mealPlan = $"Meal Plan for a {Gender} age {Age}, {Height}cm tall and weighs {Weight}kg:\n";
+            mealPlan += $"Average Calories Per Day: {averageCaloriesPerDay}\n";
+            mealPlan += $"Calories Burned Per Day: {caloriesBurnedPerDay}\n";
+            mealPlan += $"Calories to Consume Per Day: {caloriesToConsumePerDay}\n\n";
+            mealPlan += $"Breakfast: {caloriesToConsumePerDay / 4} calories\n";
+            mealPlan += $"Lunch: {caloriesToConsumePerDay / 4}";
+            return mealPlan;
         }
 
 
+
+
+
+
+
+
+
+
         // Constants for average calories per day by gender and age
-        private static readonly Dictionary<Gender, Dictionary<AgeGroup, int>> AVERAGE_CALORIES_PER_DAY = new Dictionary<Gender, Dictionary<AgeGroup, int>>
+        private static readonly Dictionary<Genders, Dictionary<AgeGroup, int>> AVERAGE_CALORIES_PER_DAY = new Dictionary<Genders, Dictionary<AgeGroup, int>>
+        {
             {
+                Genders.Male, new Dictionary<AgeGroup, int>
                 {
-                    Gender.Male, new Dictionary<AgeGroup, int>
-                    {
-                        { AgeGroup.Child, MALE_CALORIES_PER_DAY },
-                        { AgeGroup.Teenager, TEENAGER_CALORIES_PER_DAY },
-                        { AgeGroup.Adult, ADULT_CALORIES_PER_DAY },
-                        { AgeGroup.Senior, SENIOR_CALORIES_PER_DAY },
-                        { AgeGroup.Elderly, ELDERLY_CALORIES_PER_DAY }
-                    }
-                },
-                {
-                    Gender.Female, new Dictionary<AgeGroup, int>
-                    {
-                        { AgeGroup.Child, CHILD_CALORIES_PER_DAY },
-                        { AgeGroup.Teenager, TEENAGER_CALORIES_PER_DAY },
-                        { AgeGroup.Adult, FEMALE_CALORIES_PER_DAY },
-                        { AgeGroup.Senior, SENIOR_CALORIES_PER_DAY },
-                        { AgeGroup.Elderly, ELDERLY_CALORIES_PER_DAY }
-                    }
+                    { AgeGroup.Child, 1800 },
+                    { AgeGroup.Teenager, 2000 },
+                    { AgeGroup.Adult, 2200 },
+                    { AgeGroup.Senior, 2000 },
+                    { AgeGroup.Elderly, 1800 }
                 }
-            };
+            },
+            {
+                Genders.Female, new Dictionary<AgeGroup, int>
+                {
+                    { AgeGroup.Child, 1800 },
+                    { AgeGroup.Teenager, 2000 },
+                    { AgeGroup.Adult, 2000 },
+                    { AgeGroup.Senior, 1900 },
+                    { AgeGroup.Elderly, 1700 }
+                }
+            }
+        };
+
+
 
 
 
@@ -149,11 +172,11 @@ namespace MealPlanner
             AgeGroup ageGroup = GetAgeGroup();
 
             // Return the average calories per day for this person's gender and age group
-            return AVERAGE_CALORIES_PER_DAY[Gender1][ageGroup];
+            return AVERAGE_CALORIES_PER_DAY[Gender][ageGroup];
         }
 
         // Calculates the number of calories burned per day based on activity level
-        private int GetCaloriesBurnedPerDay()
+        public int GetCaloriesBurnedPerDay()
         {
             // Return the number of calories burned per day based on the activity level
             switch (ActivityLevel1)
@@ -172,6 +195,35 @@ namespace MealPlanner
                     return 0;
             }
         }
+    }
+
+    // Enum for age group
+    public enum AgeGroup
+    {
+        Child,
+        Teenager,
+        Adult,
+        Senior,
+        Elderly
+    }
+
+
+    // Enum for gender
+    public enum Genders
+    {
+        Male,
+        Female
+    }
+
+
+    // Enum for activity level
+    public enum ActivityLevel
+    {
+        Sedentary,
+        LightlyActive,
+        ModeratelyActive,
+        VeryActive,
+        ExtremelyActive
     }
 }
 
